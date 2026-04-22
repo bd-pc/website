@@ -164,7 +164,8 @@ Update your code:
 
 ```dart
 class GamePage extends StatefulWidget {
-  GamePage({super.key});
+  // added const to GamePage
+  const GamePage({super.key});
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -185,16 +186,32 @@ class _GamePageState extends State<GamePage> {
               children: [
                 for (var letter in guess)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 2.5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2.5,
+                      vertical: 2.5,
+                    ),
                     child: Tile(letter.char, letter.type),
-                  )
+                  ),
               ],
             ),
+          // Need to check if user guess is in legal word list
           GuessInput(
-           onSubmitGuess: (String guess) {
-              setState(() { // NEW
-                _game.guess(guess);
-              });
+            onSubmitGuess: (String guess) {
+              // 1. Check if the guess is in our legal word list
+              if (_game.isLegalGuess(guess)) {
+                // 2. If it is legal, update the state and play the turn
+                setState(() {
+                  _game.guess(guess);
+                });
+              } else {
+                // 3. If it is not legal, show a toast message to the user
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Not in word list!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             },
           ),
         ],
